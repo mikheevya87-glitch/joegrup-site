@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "${PORT:-3001}:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=file:/app/data/data.db
+      - JWT_SECRET=${JWT_SECRET:-change-this-in-production}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - FRONTEND_ORIGIN=${FRONTEND_ORIGIN:-http://localhost:3001}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+    volumes:
+      - app-data:/app/data
+      - app-uploads:/app/uploads
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/api/settings"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  app-data:
+  app-uploads:
